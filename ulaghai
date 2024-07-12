@@ -1,0 +1,156 @@
+# Domain.yml
+language: en
+
+intents:
+  - greet
+  - goodbye
+  - ask_fraud_types
+  - ask_phone_fraud
+  - ask_mobile_money_fraud
+  - report_fraud
+  - ask_protection_tips
+
+responses:
+  utter_greet:
+    - text: "Hello! Welcome to the Fraud Prevention Chatbot. How can I assist you today?"
+
+  utter_goodbye:
+    - text: "Thank you for using our service. Stay safe!"
+
+  utter_fraud_types:
+    - text: "We can help with two main types of fraud: Phone-related fraud and Mobile Money fraud. Which one would you like to know more about?"
+
+  utter_phone_fraud:
+    - text: "Common phone-related frauds include SIM Swap, Caller ID Spoofing, and Phishing Calls. Which one would you like more information on?"
+
+  utter_mobile_money_fraud:
+    - text: "Mobile Money frauds often include Account Takeover, Fake Agent Scams, and Reversal Fraud. Which one interests you?"
+
+  utter_report_fraud:
+    - text: "I'm sorry to hear you may be a victim of fraud. To report a fraud, please provide details about the incident, including date, time, and any relevant information. Would you like to start a report now?"
+
+  utter_protection_tips:
+    - text: "To protect yourself, always keep your PIN private, verify caller identities, and regularly monitor your account. Would you like more specific tips for a particular type of fraud?"
+
+# Data/nlu.yml
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+
+- intent: goodbye
+  examples: |
+    - good afternoon
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+
+- intent: ask_fraud_types
+  examples: |
+    - What types of fraud can you help with?
+    - Tell me about different frauds
+    - What kind of scams should I be aware of?
+    - What fraud categories do you cover?
+    - I want to know about types of fraud
+
+- intent: ask_phone_fraud
+  examples: |
+    - Tell me about phone fraud
+    - What are common phone scams?
+    - How can my phone be used for fraud?
+    - Explain phone-related fraud
+    - What should I know about telephone fraud?
+
+- intent: ask_mobile_money_fraud
+  examples: |
+    - What is mobile money fraud?
+    - Tell me about mobile payment scams
+    - How can my mobile wallet be compromised?
+    - Explain mobile money-related fraud
+    - What should I know about mobile banking fraud?
+
+- intent: report_fraud
+  examples: |
+    - I think I'm a victim of fraud
+    - How do I report a scam?
+    - I want to report a fraudulent transaction
+    - Someone tried to scam me
+    - I need to report suspicious activity
+
+- intent: ask_protection_tips
+  examples: |
+    - How can I protect myself from fraud?
+    - Give me some security tips
+    - What should I do to avoid scams?
+    - How to secure my mobile money account?
+    - Fraud prevention advice
+
+# Data/stories.yml
+stories:
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_fraud_types
+  - action: utter_fraud_types
+  - intent: ask_phone_fraud
+  - action: utter_phone_fraud
+  - intent: ask_protection_tips
+  - action: utter_protection_tips
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_mobile_money_fraud
+  - action: utter_mobile_money_fraud
+  - intent: report_fraud
+  - action: utter_report_fraud
+  - intent: goodbye
+  - action: utter_goodbye
+
+# Config.yml
+language: en
+
+pipeline:
+  - name: WhitespaceTokenizer
+  - name: RegexFeaturizer
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+  - name: DIETClassifier
+    epochs: 100
+  - name: EntitySynonymMapper
+  - name: ResponseSelector
+    epochs: 100
+
+policies:
+  - name: MemoizationPolicy
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+  - name: RulePolicy
